@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload CSV and View Results</title>
+</head>
+<body>
+    <h1>Upload CSV File</h1>
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv" required>
+        <input type="submit" value="Upload">
+    </form>
+    
+    <h2>Download Sample Data</h2>
+    <a href="/static/sample.csv" download>Download Sample CSV</a>
+    
+    <div id="results">
+        <h2>Results</h2>
+        <div id="plot-section">
+            <h3>Plot</h3>
+            <img id="plot" src="" alt="Plot Image" style="max-width: 100%;">
+        </div>
+        <div id="table-section">
+            <h3>Mean/CI Table</h3>
+            <img id="table" src="" alt="Table Image" style="max-width: 100%;">
+        </div>
+        <div id="means-and-cis">
+            <h3>Json Mean/CI</h3>
+            <pre id="means-cis"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                // Add a timestamp to invalidate cache
+                const timestamp = new Date().getTime();
+                document.getElementById('plot').src = `${data.plot_url}?${timestamp}`;
+                document.getElementById('table').src = `${data.table_url}?${timestamp}`;
+                document.getElementById('means-cis').textContent = JSON.stringify(data.means_and_cis, null, 2);
+            } else {
+                alert('Error: ' + data.error);
+            }
+        });
+    </script>
+</body>
+</html>

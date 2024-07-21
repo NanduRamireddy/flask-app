@@ -1,0 +1,6 @@
+Flask==2.2.3
+pandas==2.0.1
+numpy==1.25.0
+scipy==1.11.1
+matplotlib==3.8.1
+werkzeug==2.2.3
